@@ -1,4 +1,5 @@
 
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -44,7 +45,7 @@ public class Main {
         
         for(int i=0;i<X_LIMIT;i++){
             for(int j=0;j<Y_LIMIT;j++){
-              prob=r.nextInt(3);
+              prob=r.nextInt(5);
               if(prob==2)//-------BOMB_IS_THERE-----
               {
                   MINEMAT[i][j]=-2;MINEFLAG[i][j]=-2;
@@ -68,21 +69,21 @@ public class Main {
             XCord=s.nextInt();
             YCord=s.nextInt();
           */
-        System.out.println("Cordinates recieved are::"+XCord+","+YCord);
+      //  System.out.println("Cordinates recieved are::"+XCord+","+YCord);
             User_CLICKS++;
             revealCell(arr,XCord,YCord,0);
             if(CELLCOUNT==0){
                 if(GAMEOVER==false)//As This Method might not return to MinePanel...
-                JOptionPane.showMessageDialog(null, "YOU_WON");
+             //   JOptionPane.showMessageDialog(null, "YOU_WON");
                 GAMEOVER=true;
             }
             else{//----PLAYER_DID_NOT_WON_BUT_EITHER_LOST_OR_GAME_IS_TO_BE_CONTINUED----
-                
+                /*
             if(GAMEOVER==false){
                
                 printMINEMAT(X_LIMIT,Y_LIMIT,false);
-            }
-            else{
+            }*/
+            if(GAMEOVER==true){
                 
                 printMINEMAT(X_LIMIT,Y_LIMIT,true);
                 
@@ -95,23 +96,28 @@ public class Main {
         
         if((Count==0)&&(arr[i][j]==-2)){
             GAMEOVER=true;
-            JOptionPane.showMessageDialog(null,"YOU_LOST");
+           // JOptionPane.showMessageDialog(null,"YOU_LOST");
             System.out.println("LOST");
         }
-        else{
+        else if(arr[i][j]!=-2){
             
             //As this block will be called
             
             
                 
                 if(CELLCOUNT==0)return;
-                if(arr[i][j]==-1){FIND_ENTRY(arr,i,j);CELLCOUNT--;}
-                if(arr[i][j]==0){revealAll(arr,i,j);}//--Flag  this cell--
-                if(onlyPrint==0)System.out.println("Cord "+i+","+j+" has been revealed");
+                
+                if(arr[i][j]==-1){
+                    FIND_ENTRY(arr,i,j);
+                    CELLCOUNT--;
+                    if(arr[i][j]==0){revealAll(arr,i,j);}
+                }
+                //--Flag  this cell--
+              //  if(onlyPrint==0)System.out.println("Cord "+i+","+j+" has been revealed");
                 //if(arr[i][j]!=-2){
                     
                     
-                    Font font = new Font(Font.SANS_SERIF, Font.BOLD, 60);
+                    Font font = new Font(Font.SERIF, Font.BOLD, 60);
                     String str="8";
                     FontMetrics fm=mp.getFontMetrics(font);
                    
@@ -129,7 +135,7 @@ public class Main {
                     if(arr[i][j]==0){MinePanel.jb[i][j].setText("");}
                     else if(arr[i][j]!=-2){MinePanel.jb[i][j].setText(Integer.toString(MINEMAT[i][j]));}
                     else MinePanel.jb[i][j].setText("BOMB");
-                    
+                    MinePanel.jb[i][j].validate();
                     MinePanel.jb[i][j].setEnabled(false);
                     
             
@@ -177,28 +183,25 @@ public class Main {
                     else if(MINEMAT[i][j]==-1)System.out.print(" +");//--_-DO_NOT_SHOW_UNCOVERED_NUMBER----
                     else System.out.print(" "+MINEMAT[i][j]);
                     
-                }System.out.println();
+                }//System.out.println();
             }
         }
         else{onlyPrint=1;
             for(int i=0;i<X_LIMIT;i++){
                 for(int j=0;j<Y_LIMIT;j++){
                     
+                    
                     if((MINEMAT[i][j]==-2)){
                     MinePanel.jb[i][j].setText("BOOM");
+                    MinePanel.jb[i][j].validate();
                     MinePanel.jb[i][j].setEnabled(false);
-                        System.out.print(" @");//------SHOW_BOMB---
-                    }/*
-                    else
-                    {
-                        if(MINEMAT[i][j]==-1){
-                        revealCell(MINEMAT,i,j,1);
-                        }
-                        System.out.print(" "+MINEMAT[i][j]);
-                        
-                    } */
-                }System.out.println();
+                        //System.out.print(" @");//------SHOW_BOMB---
+                    }
+                    
+                    
+                }//System.out.println();
             }
+            
         }
         
     }
@@ -227,7 +230,7 @@ public class Main {
                 }
                 
             }
-        }System.out.println("Due to 0 no of clicks are="+min_CLICKS);
+        }//System.out.println("Due to 0 no of clicks are="+min_CLICKS);
          for(int i=0;i<X_LIMIT;i++){
             for(int j=0;j<Y_LIMIT;j++){
                 if((MINEFLAG[i][j]!=-3)&&((MINEFLAG[i][j]!=-2))){min_CLICKS++;}
@@ -247,7 +250,7 @@ public class Main {
                     if(arr[i][j]!=-2)arr[i][j]=-3;//Flag this cell to avoid recursion
                     revealAllFLAG(arr,i,j);
                 }//--Flag  this cell--
-                if(onlyPrint==0)System.out.println("Cord "+i+","+j+" has been revealed");
+                //if(onlyPrint==0)System.out.println("Cord "+i+","+j+" has been revealed");
                 if(arr[i][j]!=-2)arr[i][j]=-3;
         }
         
