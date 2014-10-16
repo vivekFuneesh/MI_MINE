@@ -20,7 +20,7 @@ import javax.swing.JPanel;
  * @author vivek
  */
 
-public class MinePanel extends JPanel implements ActionListener,Runnable
+public class MinePanel extends JPanel 
 {
     
     static int syncFlag[],syncTurn=0;
@@ -29,7 +29,6 @@ public class MinePanel extends JPanel implements ActionListener,Runnable
     static MouseAdapter ma;
     static JButton[][] jb;
     static MineGUI GUI=null;
-    static Thread t=null;
     //-------------------------SLEEPING--TIME--VARIABLES-------------------------------------
     //static long beforetime,aftertime,timediff,sleeptime,oversleeptime,excess;
     //static int skip=0;
@@ -40,6 +39,7 @@ public class MinePanel extends JPanel implements ActionListener,Runnable
         MinePanel.pWidth=pWidth;MinePanel.pHeight=pHeight;
         setPreferredSize(new Dimension(pWidth,pHeight));
         setLayout(new GridLayout());
+        
     }
     
     @Override
@@ -61,7 +61,6 @@ public class MinePanel extends JPanel implements ActionListener,Runnable
         
       
       Main.GAMEOVER=true;
-      t=null;
       if(ma!=null)removeMouseListener(ma);ma=null;
       removeAll();
       GUI.Activate();
@@ -89,7 +88,7 @@ public class MinePanel extends JPanel implements ActionListener,Runnable
         blockHeight*=10;
         blockHeight/=level;
         
-        System.out.println("Block dimensions are::"+blockWidth+","+blockHeight);
+       // System.out.println("Block dimensions are::"+blockWidth+","+blockHeight);
         syncFlag=new int[2];
         syncFlag[0]=syncFlag[1]=0;
         //--------PREPARING THIS PANEL FOR DRAWING----
@@ -101,7 +100,7 @@ public class MinePanel extends JPanel implements ActionListener,Runnable
        
         syncFlag[0]=1;syncTurn=1;
         
-        processMouseEvent();
+        processMousyEvent();
         
         for(int i=0;i<level;i++){
             for(int j=0;j<level;j++){
@@ -116,18 +115,7 @@ public class MinePanel extends JPanel implements ActionListener,Runnable
        
         Main.GENERATE_RANDOM_MATRIX(level,level);
         Main.FIND_MINIMUM_NO_OF_CLICKS(level,level);
-       
-        
-       syncFlag[0]=0; 
-       
-       t=new Thread(this);
-       t.start();
-       
-    }
-  
-    @Override
-    public void run(){
-        Random r=new Random();int j=0;
+               Random r=new Random();int j=0;
           for(int i=0;i<level;i++){
               
              j=r.nextInt(level);
@@ -136,73 +124,60 @@ public class MinePanel extends JPanel implements ActionListener,Runnable
                 jb[i][j].setEnabled(true);
             
         }
-      
-        while(Main.GAMEOVER==false){
-            
-            syncFlag[0]=1;syncTurn=1;
-            while(true){if((syncFlag[1]!=1)||(syncTurn!=1))break;}
-            if(Main.GAMEOVER==true)break;
-     
-       //---------WAITING FOR GUI EVENT TO COMPLETE-------------------
-              //-------------------------------------------------------------     
-            
-            
-            //------------
-            syncFlag[0]=0;
-        }
-                  if(ma!=null)
-                  removeMouseListener(ma);
-                   saveScores();
-                   try{//Thread.sleep(2000);
-                   }catch(Exception er){}
-                    resetALL();
-                   
-                   
-               
-    
+       
+        
+       syncFlag[0]=0; 
+       
+       
     }
+  
     
     //ASSUMING THAT THREADS OF SWING WILL RETURN SAFELY WITHIN TIME??
     
-    void processMouseEvent(){
+    void processMousyEvent(){
          
+       
+        
+        //__WAIT FOR_PREVIOUS_EVENT_OU_UI_UPDATE_TO_BE_COMPLETED--
+        
          this.addMouseListener(ma=new MouseAdapter(){
              
              @Override
              public void mouseClicked(final MouseEvent me){
-               
+                if(ma!=null)removeMouseListener(ma);
                syncFlag[1]=1;
                syncTurn=0;
-               while(true){if((syncFlag[0]!=1)||(syncTurn!=0))break;}
-               if(ma!=null)removeMouseListener(ma);
-               
+               while(true){//System.out.println("WAITING_INSIDE_MOUSE_HANDLER");
+               if((syncFlag[0]!=1)||(syncTurn!=0))break;}
+              
+             //  System.out.println("Calculating inside mouse_handler");
                if(Main.GAMEOVER==false)//----GAME NOT OUT WHILE WAITING----
                {
-                   System.out.println("SENDING CORDS::"+me.getXOnScreen()+","+me.getYOnScreen()+"");
+                 //  System.out.println("SENDING CORDS::"+me.getXOnScreen()+","+me.getYOnScreen()+"");
                    Main.START_GAME(Main.MINEMAT, level,level, (me.getYOnScreen()/blockHeight),(me.getXOnScreen()/blockWidth));
                    
                    //repaint();
                }//THIS THREAD MAY NOT RETURN AT APPROPRIATE TIME AFTER START_GAME(-,-,-,)CALLING...
-             
-               if((ma==null)&&(Main.GAMEOVER!=true)){processMouseEvent();}
               
                syncFlag[1]=0;
+               if((ma==null)&&(Main.GAMEOVER==false)){processMousyEvent();}
+                else if(Main.GAMEOVER==true){
+                   if(ma!=null)removeMouseListener(ma);
+                   saveScores();
+                   resetALL();
+ 
+                }  
+       
              }
          }
                  );
      
      }
 
-    public void actionPerformed(ActionEvent e) {
-        
-   
-        
-        
-    }
 
     public void saveScores(){
         
-        System.out.println("total="+Main.TotalCount+" and revealed="+Main.CELLCOUNT);
+      //  System.out.println("total="+Main.TotalCount+" and revealed="+Main.CELLCOUNT);
         Main.Score=(Main.TotalCount-Main.CELLCOUNT)*100;
                    
         Main.Score/=Main.TotalCount;
